@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root {
+  /* HashiCorp-inspired Design Tokens - Balanced Dark Mode */
+  
+  /* Canvas & Surfaces */
+  --canvas: #0a0a0a;
+  --surface-1: #15181e;
+  --surface-2: #1f232b;
+  --surface-3: #3b3d45;
+  
+  /* Text Colors */
+  --ink: #ffffff;
+  --ink-muted: #b2b6bd;
+  --ink-subtle: #656a76;
+  
+  /* Borders */
+  --hairline: #3b3d45;
+  --hairline-soft: #252830;
+  
+  /* Primary & Accents */
+  --primary: #000000;
+  --accent-blue: #2b89ff;
+  
+  /* Product Colors */
+  --product-terraform: #7b42bc;
+  --product-vault: #ffcf25;
+  --product-consul: #e62b1e;
+  --product-waypoint: #14c6cb;
+  --product-vagrant: #1868f2;
+  --product-nomad: #00ca8e;
+  --product-boundary: #f24c53;
+  
+  /* Semantic Colors */
+  --semantic-success: #00ca8e;
+  --semantic-warning: #ffcf25;
+  --semantic-error: #e62b1e;
+  --semantic-info: #2b89ff;
+  
+  /* Legacy support */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  /* Base Colors */
+  --color-canvas: var(--canvas);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  
+  --color-hairline: var(--hairline);
+  --color-hairline-soft: var(--hairline-soft);
+  
+  --color-primary: var(--primary);
+  --color-accent-blue: var(--accent-blue);
+  
+  /* Product Colors */
+  --color-terraform: var(--product-terraform);
+  --color-vault: var(--product-vault);
+  --color-consul: var(--product-consul);
+  --color-waypoint: var(--product-waypoint);
+  --color-vagrant: var(--product-vagrant);
+  --color-nomad: var(--product-nomad);
+  --color-boundary: var(--product-boundary);
+  
+  /* Semantic Colors */
+  --color-success: var(--semantic-success);
+  --color-warning: var(--semantic-warning);
+  --color-error: var(--semantic-error);
+  --color-info: var(--semantic-info);
+  
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Legacy */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Spacing */
+  --spacing-hair: 1px;
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-xxl: 24px;
+  --radius-pill: 9999px;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom Utility Classes */
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--hairline-soft);
+  border-radius: var(--radius-lg);
+}
+
+.card-elevated {
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+}
+
+.text-muted {
+  color: var(--ink-muted);
+}
+
+.text-subtle {
+  color: var(--ink-subtle);
+}
