@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Appointment } from '@/lib/types';
 import { colors } from '@/styles/design-tokens';
 import { X } from 'lucide-react';
 
@@ -14,9 +15,17 @@ export interface AppointmentModalProps {
     endTime: string;
     description: string;
   }) => void;
+  initialData?: Appointment;
+  mode?: 'create' | 'edit';
 }
 
-export function AppointmentModal({ isOpen, onClose, onSubmit }: AppointmentModalProps) {
+export function AppointmentModal({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  initialData,
+  mode = 'create'
+}: AppointmentModalProps) {
   const [formData, setFormData] = useState({
     startDate: '',
     startTime: '',
@@ -26,6 +35,28 @@ export function AppointmentModal({ isOpen, onClose, onSubmit }: AppointmentModal
   });
   const [error, setError] = useState('');
 
+  // Populate form when initialData changes
+  useEffect(() => {
+    if (initialData && mode === 'edit') {
+      setFormData({
+        startDate: initialData.startDate,
+        startTime: initialData.startTime,
+        endDate: initialData.endDate,
+        endTime: initialData.endTime,
+        description: initialData.description,
+      });
+    } else if (!isOpen) {
+      // Reset form when modal closes
+      setFormData({
+        startDate: '',
+        startTime: '',
+        endDate: '',
+        endTime: '',
+        description: '',
+      });
+    }
+  }, [initialData, mode, isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,17 +65,19 @@ export function AppointmentModal({ isOpen, onClose, onSubmit }: AppointmentModal
 
     try {
       onSubmit(formData);
-      // Reset form
-      setFormData({
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        description: '',
-      });
+      // Reset form only in create mode
+      if (mode === 'create') {
+        setFormData({
+          startDate: '',
+          startTime: '',
+          endDate: '',
+          endTime: '',
+          description: '',
+        });
+      }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add appointment');
+      setError(err instanceof Error ? err.message : `Failed to ${mode} entry`);
     }
   };
 
@@ -72,7 +105,7 @@ export function AppointmentModal({ isOpen, onClose, onSubmit }: AppointmentModal
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: colors.hairline }}>
           <h2 className="text-xl font-semibold" style={{ color: colors.ink }}>
-            Add New Appointment
+            {mode === 'edit' ? 'Edit Entry' : 'Add New Entry'}
           </h2>
           <button
             onClick={onClose}
@@ -216,7 +249,7 @@ export function AppointmentModal({ isOpen, onClose, onSubmit }: AppointmentModal
                 color: colors.ink,
               }}
             >
-              Add Appointment
+              {mode === 'edit' ? 'Update Entry' : 'Add Entry'}
             </button>
           </div>
         </form>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Appointment, Folga } from '@/lib/types';
 import { useAppointmentStorage } from '@/hooks/useAppointmentStorage';
 import { useFolgaStorage } from '@/hooks/useFolgaStorage';
 import { useCombinedAnalytics } from '@/hooks/useCombinedAnalytics';
@@ -12,6 +13,7 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { MetricsGrid } from '@/components/dashboard/MetricsGrid';
 import { ChartGrid, ChartCard } from '@/components/dashboard/ChartGrid';
 import { ExportButton } from '@/components/dashboard/ExportButton';
+import { ImportButton } from '@/components/dashboard/ImportButton';
 
 // Chart Components
 import { LineChart } from '@/components/charts/LineChart';
@@ -34,10 +36,14 @@ import { FolgaList } from '@/components/folga/FolgaList';
 import { Plus, Sunrise } from 'lucide-react';
 
 export default function Home() {
-  const { appointments, isLoaded: appointmentsLoaded, add, delete: deleteAppointment } = useAppointmentStorage();
-  const { folgas, isLoaded: folgasLoaded, add: addFolga, delete: deleteFolga } = useFolgaStorage();
+  const { appointments, isLoaded: appointmentsLoaded, add, update, delete: deleteAppointment } = useAppointmentStorage();
+  const { folgas, isLoaded: folgasLoaded, add: addFolga, update: updateFolga, delete: deleteFolga } = useFolgaStorage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFolgaModalOpen, setIsFolgaModalOpen] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingFolga, setEditingFolga] = useState<Folga | null>(null);
+  const [isEditFolgaModalOpen, setIsEditFolgaModalOpen] = useState(false);
   
   const isLoaded = appointmentsLoaded && folgasLoaded;
   
@@ -90,6 +96,72 @@ export default function Home() {
     );
   };
 
+  const handleImportAppointments = (importedAppointments: any[]) => {
+    importedAppointments.forEach((apt) => {
+      add(apt);
+    });
+  };
+
+  const handleImportFolgas = (importedFolgas: any[]) => {
+    importedFolgas.forEach((folga) => {
+      addFolga(
+        folga.startDate,
+        folga.startTime,
+        folga.endDate,
+        folga.endTime,
+        folga.description,
+        folga.hasLunchBreak || false,
+        folga.lunchDuration || 1
+    
+
+  const handleEditAppointment = (appointment: Appointment) => {
+    setEditingAppointment(appointment);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateAppointment = (data: {
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
+    description: string;
+  }) => {
+    if (editingAppointment) {
+      update({
+        ...editingAppointment,
+        ...data,
+      });
+      setEditingAppointment(null);
+    
+
+  const handleEditFolga = (folga: Folga) => {
+    setEditingFolga(folga);
+    setIsEditFolgaModalOpen(true);
+  };
+
+  const handleUpdateFolga = (data: {
+    startDate: string;
+    startTime: string;
+    endDate: string;
+    endTime: string;
+    description: string;
+    hasLunchBreak?: boolean;
+    lunchDuration?: number;
+  }) => {
+    if (editingFolga) {
+      updateFolga({
+        ...editingFolga,
+        ...data,
+      });
+      setEditingFolga(null);
+      setIsEditFolgaModalOpen(false);
+    }
+  };  setIsEditModalOpen(false);
+    }
+  };  );
+    });
+  };
+
   if (!isLoaded) {
     return (
       <div 
@@ -106,10 +178,14 @@ export default function Home() {
   return (
     <>
       <DashboardLayout
-        title="Appointment Dashboard"
-        subtitle={`${appointments.length} work appointments • ${folgas.length} time-off • ${filteredAppointments.length + filteredFolgas.length} filtered`}
+        title="ExtraTime Dashboard"
+        subtitle={`${appointments.length} work entries • ${folgas.length} time-off • ${filteredAppointments.length + filteredFolgas.length} filtered`}
         actions={
           <div className="flex items-center gap-3">
+            <ImportButton 
+              onImportAppointments={handleImportAppointments}
+              onImportFolgas={handleImportFolgas}
+            />
             <ExportButton appointments={filteredAppointments} />
             <button
               onClick={() => setIsFolgaModalOpen(true)}
@@ -131,7 +207,7 @@ export default function Home() {
               }}
             >
               <Plus className="w-4 h-4" />
-              Add Appointment
+              Add Entry
             </button>
           </div>
         }
@@ -195,11 +271,12 @@ export default function Home() {
           {/* Appointments List */}
           <div className="card p-6" style={{ borderColor: colors['hairline-soft'] }}>
             <h2 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
-              Recent Appointments ({filteredAppointments.length})
+              Recent Entries ({filteredAppointments.length})
             </h2>
             <AppointmentList
               appointments={filteredAppointments}
               onDelete={deleteAppointment}
+              onEdit={handleEditAppointment}
             />
           </div>
 
@@ -211,6 +288,7 @@ export default function Home() {
             <FolgaList
               folgas={filteredFolgas}
               onDelete={deleteFolga}
+              onEdit={handleEditFolga}
             />
           </div>
         </div>
@@ -223,11 +301,35 @@ export default function Home() {
         onSubmit={handleAddAppointment}
       />
 
+      {/* Edit Appointment Modal */}
+      <AppointmentModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingAppointment(null);
+        }}
+        onSubmit={handleUpdateAppointment}
+        initialData={editingAppointment || undefined}
+        mode="edit"
+      />
+
       {/* Add Folga Modal */}
       <FolgaModal
         isOpen={isFolgaModalOpen}
         onClose={() => setIsFolgaModalOpen(false)}
         onSubmit={handleAddFolga}
+      />
+
+      {/* Edit Folga Modal */}
+      <FolgaModal
+        isOpen={isEditFolgaModalOpen}
+        onClose={() => {
+          setIsEditFolgaModalOpen(false);
+          setEditingFolga(null);
+        }}
+        onSubmit={handleUpdateFolga}
+        initialData={editingFolga || undefined}
+        mode="edit"
       />
     </>
   );

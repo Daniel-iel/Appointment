@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Appointment Tracker - Rastreador de Horas",
+  title: "ExtraTime - Rastreador de Horas",
   description: "Acompanhe suas horas de trabalho e gerencie compensações",
 };
 

@@ -49,7 +49,7 @@ export function MetricsGrid({ metrics }: MetricsGridProps) {
       />
       
       <KPICard
-        title="Avg / Appointment"
+        title="Avg / Entry"
         value={metrics.averagePerAppointment.toFixed(1)}
         unit="h"
         icon={<BarChart3 className="w-5 h-5" />}

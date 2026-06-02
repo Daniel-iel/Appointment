@@ -10,7 +10,7 @@ import {
 } from '@/lib/storage'
 
 /**
- * Custom hook for managing appointments with localStorage persistence
+ * Custom hook for managing work entries with localStorage persistence
  * @returns Object with appointment state and methods
  */
 export function useAppointmentStorage() {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Folga } from '@/lib/types';
 import { colors } from '@/styles/design-tokens';
 import { X, Sunrise } from 'lucide-react';
 import { calcTotalHours, applyLunchDeduction } from '@/lib/calculations';
@@ -17,9 +18,17 @@ export interface FolgaModalProps {
     hasLunchBreak?: boolean;
     lunchDuration?: number;
   }) => void;
+  initialData?: Folga;
+  mode?: 'create' | 'edit';
 }
 
-export function FolgaModal({ isOpen, onClose, onSubmit }: FolgaModalProps) {
+export function FolgaModal({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  initialData,
+  mode = 'create'
+}: FolgaModalProps) {
   const [formData, setFormData] = useState({
     startDate: '',
     startTime: '',
@@ -31,6 +40,33 @@ export function FolgaModal({ isOpen, onClose, onSubmit }: FolgaModalProps) {
   const [calculatedHours, setCalculatedHours] = useState<number | null>(null);
   const [hasLunchBreak, setHasLunchBreak] = useState(false);
   const [lunchDuration, setLunchDuration] = useState(1);
+
+  // Populate form when initialData changes
+  useEffect(() => {
+    if (initialData && mode === 'edit') {
+      setFormData({
+        startDate: initialData.startDate,
+        startTime: initialData.startTime,
+        endDate: initialData.endDate,
+        endTime: initialData.endTime,
+        description: initialData.description,
+      });
+      setHasLunchBreak(initialData.hasLunchBreak || false);
+      setLunchDuration(initialData.lunchDuration || 1);
+    } else if (!isOpen) {
+      // Reset form when modal closes
+      setFormData({
+        startDate: '',
+        startTime: '',
+        endDate: '',
+        endTime: '',
+        description: '',
+      });
+      setCalculatedHours(null);
+      setHasLunchBreak(false);
+      setLunchDuration(1);
+    }
+  }, [initialData, mode, isOpen]);
 
   // Calculate hours when dates/times change
   useEffect(() => {
@@ -64,20 +100,22 @@ export function FolgaModal({ isOpen, onClose, onSubmit }: FolgaModalProps) {
         hasLunchBreak,
         lunchDuration,
       });
-      // Reset form
-      setFormData({
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        description: '',
-      });
-      setCalculatedHours(null);
-      setHasLunchBreak(false);
-      setLunchDuration(1);
+      // Reset form only in create mode
+      if (mode === 'create') {
+        setFormData({
+          startDate: '',
+          startTime: '',
+          endDate: '',
+          endTime: '',
+          description: '',
+        });
+        setCalculatedHours(null);
+        setHasLunchBreak(false);
+        setLunchDuration(1);
+      }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add time-off');
+      setError(err instanceof Error ? err.message : `Failed to ${mode} time-off`);
     }
   };
 
@@ -112,7 +150,7 @@ export function FolgaModal({ isOpen, onClose, onSubmit }: FolgaModalProps) {
               <Sunrise className="w-5 h-5" style={{ color: colors['product-vault'] }} />
             </div>
             <h2 className="text-xl font-semibold" style={{ color: colors.ink }}>
-              Add Time-Off (Folga)
+              {mode === 'edit' ? 'Edit Time-Off (Folga)' : 'Add Time-Off (Folga)'}
             </h2>
           </div>
           <button
@@ -329,7 +367,7 @@ export function FolgaModal({ isOpen, onClose, onSubmit }: FolgaModalProps) {
                 color: colors.canvas,
               }}
             >
-              Add Time-Off
+              {mode === 'edit' ? 'Update Time-Off' : 'Add Time-Off'}
             </button>
           </div>
         </form>

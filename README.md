@@ -1,4 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ExtraTime
+
+Track your work hours, manage time-off, and monitor work-life balance with this modern Next.js application.
+
+## Features
+
+- ⏱️ Track work entries with start/end times
+- 🌅 Manage time-off (folgas) with lunch break deductions
+- 📊 Comprehensive analytics and visualizations
+- 📈 KPI metrics (total hours, balance, averages)
+- 📅 Filter by period (week, month, quarter, year, custom range)
+- 💾 CSV import/export for data portability
+- ✏️ Full CRUD operations (Create, Read, Update, Delete)
+- 🎨 Modern, responsive UI with HashiCorp design tokens
+- 💾 Local storage persistence
 
 ## Getting Started
 

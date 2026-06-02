@@ -3,15 +3,16 @@
 import { Appointment } from '@/lib/types';
 import { calcTotalHours } from '@/lib/calculations';
 import { colors } from '@/styles/design-tokens';
-import { Trash2, Clock } from 'lucide-react';
+import { Trash2, Clock, Pencil } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 export interface AppointmentListProps {
   appointments: Appointment[];
   onDelete: (id: string) => void;
+  onEdit?: (appointment: Appointment) => void;
 }
 
-export function AppointmentList({ appointments, onDelete }: AppointmentListProps) {
+export function AppointmentList({ appointments, onDelete, onEdit }: AppointmentListProps) {
   if (appointments.length === 0) {
     return (
       <div className="card p-8 text-center">
@@ -23,10 +24,10 @@ export function AppointmentList({ appointments, onDelete }: AppointmentListProps
             <Clock className="w-8 h-8" style={{ color: colors['ink-subtle'] }} />
           </div>
           <p className="text-lg font-medium" style={{ color: colors['ink-muted'] }}>
-            No appointments yet
+            No entries yet
           </p>
           <p className="text-sm" style={{ color: colors['ink-subtle'] }}>
-            Click "Add Appointment" to get started
+            Click "Add Entry" to get started
           </p>
         </div>
       </div>
@@ -80,16 +81,32 @@ export function AppointmentList({ appointments, onDelete }: AppointmentListProps
               </div>
 
               {/* Actions */}
-              <button
-                onClick={() => onDelete(apt.id)}
-                className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                style={{
-                  color: colors['semantic-error'],
-                }}
-                title="Delete appointment"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {onEdit && (
+                  <button
+                    onClick={() => onEdit(apt)}
+                    className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                    style={{
+                      color: colors['product-waypoint'],
+                    }}
+                    title="Edit entry"
+                    aria-label="Edit entry"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={() => onDelete(apt.id)}
+                  className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                  style={{
+                    color: colors['semantic-error'],
+                  }}
+                  title="Delete entry"
+                  aria-label="Delete entry"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         );

@@ -2,15 +2,16 @@
 
 import { Folga } from '@/lib/types';
 import { colors } from '@/styles/design-tokens';
-import { Trash2, Sunrise, Utensils } from 'lucide-react';
+import { Trash2, Sunrise, Utensils, Pencil } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 export interface FolgaListProps {
   folgas: Folga[];
   onDelete: (id: string) => void;
+  onEdit?: (folga: Folga) => void;
 }
 
-export function FolgaList({ folgas, onDelete }: FolgaListProps) {
+export function FolgaList({ folgas, onDelete, onEdit }: FolgaListProps) {
   if (folgas.length === 0) {
     return (
       <div
@@ -121,16 +122,32 @@ export function FolgaList({ folgas, onDelete }: FolgaListProps) {
               </div>
 
               {/* Actions */}
-              <button
-                onClick={() => onDelete(folga.id)}
-                className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                style={{
-                  color: colors['semantic-error'],
-                }}
-                title="Delete time-off"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {onEdit && (
+                  <button
+                    onClick={() => onEdit(folga)}
+                    className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                    style={{
+                      color: colors['product-vault'],
+                    }}
+                    title="Edit time-off"
+                    aria-label="Edit time-off"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={() => onDelete(folga.id)}
+                  className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                  style={{
+                    color: colors['semantic-error'],
+                  }}
+                  title="Delete time-off"
+                  aria-label="Delete time-off"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         );

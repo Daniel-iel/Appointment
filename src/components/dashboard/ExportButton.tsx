@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Appointment } from '@/lib/types';
-import { downloadCSV, downloadJSON } from '@/lib/export';
+import { downloadCSV } from '@/lib/export';
 import { colors } from '@/styles/design-tokens';
 import { Download, ChevronDown } from 'lucide-react';
 
@@ -15,11 +15,6 @@ export function ExportButton({ appointments }: ExportButtonProps) {
 
   const handleExportCSV = () => {
     downloadCSV(appointments);
-    setIsOpen(false);
-  };
-
-  const handleExportJSON = () => {
-    downloadJSON(appointments);
     setIsOpen(false);
   };
 
@@ -69,21 +64,6 @@ export function ExportButton({ appointments }: ExportButtonProps) {
                 }}
               >
                 Export as CSV
-              </button>
-              <button
-                onClick={handleExportJSON}
-                className="w-full text-left px-4 py-2 text-sm transition-colors"
-                style={{
-                  color: colors.ink,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = colors['surface-3'];
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
-              >
-                Export as JSON
               </button>
             </div>
           </div>
