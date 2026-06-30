@@ -236,7 +236,8 @@ export function getOverallStats(appointments: Appointment[], folgas: Folga[] = [
   const totalFolgaHours = folgas.reduce((sum, folga) => sum + folga.hours, 0);
 
   const expectedHours = appointments.length * 8;
-  const balance = totalHours - expectedHours - totalFolgaHours;
+  // Balance is defined as: sum(Entries) - sum(Time-Off)
+  const balance = totalHours - totalFolgaHours;
   const averagePerAppointment = appointments.length > 0 ? totalHours / appointments.length : 0;
 
   const uniqueDates = new Set(appointments.map((apt) => apt.startDate));

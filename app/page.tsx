@@ -186,7 +186,7 @@ export default function Home() {
               onImportAppointments={handleImportAppointments}
               onImportFolgas={handleImportFolgas}
             />
-            <ExportButton appointments={filteredAppointments} />
+            <ExportButton appointments={filteredAppointments} folgas={filteredFolgas} />
             <button
               onClick={() => setIsFolgaModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all hover:opacity-90"

@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Appointment } from '@/lib/types';
+import { Appointment, Folga } from '@/lib/types';
 import { downloadCSV } from '@/lib/export';
 import { colors } from '@/styles/design-tokens';
 import { Download, ChevronDown } from 'lucide-react';
 
 export interface ExportButtonProps {
   appointments: Appointment[];
+  folgas?: Folga[];
 }
 
 export function ExportButton({ appointments }: ExportButtonProps) {

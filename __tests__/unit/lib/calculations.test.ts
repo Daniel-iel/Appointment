@@ -47,7 +47,8 @@ describe('calcCompensationStatus', () => {
 
     const status = calcCompensationStatus(appointments)
     expect(status.totalHours).toBe(8)
-    expect(status.balance).toBe(0)
+    // balance = sum(Entries) - sum(TimeOff) => 8 - 0 = 8
+    expect(status.balance).toBe(8)
   })
 
   it('should calculate correct balance with multiple appointments', () => {
@@ -76,7 +77,8 @@ describe('calcCompensationStatus', () => {
 
     const status = calcCompensationStatus(appointments)
     expect(status.totalHours).toBe(17)
-    expect(status.balance).toBe(1) // 1 hour surplus (17 - 8*2)
+    // balance = sum(Entries) - sum(TimeOff) => 17 - 0 = 17
+    expect(status.balance).toBe(17)
   })
 
   it('should return empty status for empty array', () => {

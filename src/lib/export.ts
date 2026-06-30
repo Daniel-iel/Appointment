@@ -1,4 +1,4 @@
-import { Appointment } from './types';
+import { Appointment, Folga } from './types';
 import { calcTotalHours } from './calculations';
 import { getOverallStats } from './analytics';
 import { format } from 'date-fns';
@@ -76,8 +76,8 @@ export function downloadCSV(appointments: Appointment[], filename?: string): voi
 /**
  * Export appointments to JSON format
  */
-export function exportToJSON(appointments: Appointment[]): string {
-  const stats = getOverallStats(appointments);
+export function exportToJSON(appointments: Appointment[], folgas: Folga[] = []): string {
+  const stats = getOverallStats(appointments, folgas);
   
   const exportData = {
     exportedAt: new Date().toISOString(),
@@ -94,8 +94,8 @@ export function exportToJSON(appointments: Appointment[]): string {
 /**
  * Download JSON file to browser
  */
-export function downloadJSON(appointments: Appointment[], filename?: string): void {
-  const json = exportToJSON(appointments);
+export function downloadJSON(appointments: Appointment[], folgas: Folga[] = [], filename?: string): void {
+  const json = exportToJSON(appointments, folgas);
   const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
   const link = document.createElement('a');
   
@@ -113,8 +113,8 @@ export function downloadJSON(appointments: Appointment[], filename?: string): vo
 /**
  * Generate a text summary report
  */
-export function generateSummaryReport(appointments: Appointment[]): string {
-  const stats = getOverallStats(appointments);
+export function generateSummaryReport(appointments: Appointment[], folgas: Folga[] = []): string {
+  const stats = getOverallStats(appointments, folgas);
   
   const report = `
 APPOINTMENT SUMMARY REPORT
@@ -124,7 +124,7 @@ Generated: ${format(new Date(), 'PPpp')}
 Total Appointments: ${stats.totalAppointments}
 Total Hours Worked: ${stats.totalHours}h
 Expected Hours: ${stats.expectedHours}h (based on 8h/day standard)
-Balance: ${stats.balance >= 0 ? '+' : ''}${stats.balance}h
+  Balance: ${stats.balance >= 0 ? '+' : ''}${stats.balance}h
 
 === AVERAGES ===
 Average per Appointment: ${stats.averagePerAppointment}h

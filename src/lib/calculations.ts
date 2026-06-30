@@ -66,37 +66,21 @@ export function calcTotalHours(startDateOrTime: string, endTimeOrStartTime: stri
  * @returns CompensationStatus with totals and balance
  */
 export function calcCompensationStatus(appointments: Appointment[], folgas: Folga[] = []): CompensationStatus {
-  if (!appointments || appointments.length === 0) {
-    // If there are only folgas, they create debt
-    const totalFolgaHours = folgas.reduce((sum, folga) => sum + folga.hours, 0);
-    
-    return {
-      totalHours: 0,
-      owedHours: -totalFolgaHours,
-      compensatedHours: 0,
-      balance: -totalFolgaHours,
-    };
-  }
-
-  const totalHours = appointments.reduce((sum, apt) => {
+  // Sum worked hours (safe against invalid entries)
+  const totalHours = (appointments || []).reduce((sum, apt) => {
     try {
-      const hours = calcTotalHours(apt.startTime, apt.endTime)
-      return sum + hours
+      const hours = calcTotalHours(apt.startTime, apt.endTime);
+      return sum + hours;
     } catch {
-      return sum
+      return sum;
     }
   }, 0);
 
-  // Calculate total folga hours (debt)
-  const totalFolgaHours = folgas.reduce((sum, folga) => sum + folga.hours, 0);
+  // Sum folga (time-off) hours
+  const totalFolgaHours = (folgas || []).reduce((sum, folga) => sum + folga.hours, 0);
 
-  // Standard is 8 hours per day (only for work appointments, not folgas)
-  const standardHoursPerDay = 8;
-  const expectedHours = appointments.length * standardHoursPerDay;
-
-  // Balance = hours worked - expected hours - folga hours
-  // Example: 16h worked - 16h expected - 8h folga = -8h balance
-  const balance = totalHours - expectedHours - totalFolgaHours;
+  // Balance definition: sum(Entries) - sum(TimeOff)
+  const balance = totalHours - totalFolgaHours;
   const owedHours = balance < 0 ? balance : 0;
   const compensatedHours = balance > 0 ? balance : 0;
 

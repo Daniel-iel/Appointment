@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Appointment } from '@/lib/types';
+import { Appointment, Folga } from '@/lib/types';
 import {
   aggregateByDay,
   aggregateByWeek,
@@ -10,9 +10,9 @@ import {
   getOverallStats,
 } from '@/lib/analytics';
 
-export function useAnalytics(appointments: Appointment[]) {
-  // Memoize expensive calculations
-  const stats = useMemo(() => getOverallStats(appointments), [appointments]);
+export function useAnalytics(appointments: Appointment[], folgas: Folga[] = []) {
+  // Memoize expensive calculations (include folgas optionally)
+  const stats = useMemo(() => getOverallStats(appointments, folgas), [appointments, folgas]);
   
   const dailyData = useMemo(() => aggregateByDay(appointments), [appointments]);
   
