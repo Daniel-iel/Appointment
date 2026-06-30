@@ -112,7 +112,9 @@ export default function Home() {
         folga.description,
         folga.hasLunchBreak || false,
         folga.lunchDuration || 1
-    
+      );
+    });
+  };
 
   const handleEditAppointment = (appointment: Appointment) => {
     setEditingAppointment(appointment);
@@ -132,7 +134,9 @@ export default function Home() {
         ...data,
       });
       setEditingAppointment(null);
-    
+      setIsEditModalOpen(false);
+    }
+  };
 
   const handleEditFolga = (folga: Folga) => {
     setEditingFolga(folga);
@@ -156,10 +160,6 @@ export default function Home() {
       setEditingFolga(null);
       setIsEditFolgaModalOpen(false);
     }
-  };  setIsEditModalOpen(false);
-    }
-  };  );
-    });
   };
 
   if (!isLoaded) {

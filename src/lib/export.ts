@@ -4,6 +4,28 @@ import { getOverallStats } from './analytics';
 import { format } from 'date-fns';
 
 /**
+ * Sanitize CSV field to prevent formula injection
+ * @param value - Value to sanitize
+ * @returns Sanitized value safe for CSV export
+ */
+function sanitizeForCSV(value: string): string {
+  if (typeof value !== 'string') {
+    return '""';
+  }
+
+  // Escape formula injection - prefix dangerous characters with single quote
+  if (/^[=+\-@\t\r]/.test(value)) {
+    value = "'" + value;
+  }
+
+  // Escape double quotes for CSV
+  value = value.replace(/"/g, '""');
+  
+  // Wrap in quotes
+  return `"${value}"`;
+}
+
+/**
  * Export appointments to CSV format
  */
 export function exportToCSV(appointments: Appointment[]): string {
@@ -18,7 +40,7 @@ export function exportToCSV(appointments: Appointment[]): string {
       apt.endDate,
       apt.endTime,
       duration.toFixed(2),
-      `"${apt.description.replace(/"/g, '""')}"`, // Escape quotes
+      sanitizeForCSV(apt.description), // Prevent formula injection
       apt.createdAt,
       apt.updatedAt,
     ];

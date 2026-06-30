@@ -1,6 +1,6 @@
 import { Appointment, Folga } from './types';
 import { generateUUID } from './uuid';
-import { validateTimeFormat, validateDateFormat } from '@/utils/validators';
+import { validateTimeFormat, validateDateFormat, sanitizeDescription } from '@/utils/validators';
 
 export interface CSVImportResult {
   type: 'appointment' | 'folga';
@@ -21,6 +21,11 @@ export class CSVImportValidationError extends Error {
   }
 }
 
+// Security limits to prevent DoS attacks
+const MAX_LINE_LENGTH = 100000; // 100KB per line
+const MAX_FIELD_LENGTH = 10000;  // 10KB per field
+const MAX_ROWS = 10000; // Maximum number of rows
+
 /**
  * Parse CSV content into rows and columns
  */
@@ -28,7 +33,15 @@ function parseCSV(content: string): string[][] {
   const lines = content.trim().split(/\r?\n/);
   const result: string[][] = [];
 
+  if (lines.length > MAX_ROWS) {
+    throw new Error(`CSV exceeds maximum of ${MAX_ROWS} rows`);
+  }
+
   for (const line of lines) {
+    if (line.length > MAX_LINE_LENGTH) {
+      throw new Error(`Line exceeds maximum length of ${MAX_LINE_LENGTH} characters`);
+    }
+
     const row: string[] = [];
     let current = '';
     let inQuotes = false;
@@ -36,6 +49,10 @@ function parseCSV(content: string): string[][] {
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
       const nextChar = line[i + 1];
+
+      if (current.length > MAX_FIELD_LENGTH) {
+        throw new Error(`Field exceeds maximum length of ${MAX_FIELD_LENGTH} characters`);
+      }
 
       if (char === '"' && inQuotes && nextChar === '"') {
         // Escaped quote
@@ -104,7 +121,8 @@ function validateAppointmentRow(
   const startTime = data['start time'] || '';
   const endDate = data['end date'] || '';
   const endTime = data['end time'] || '';
-  const description = data['description'] || '';
+  const rawDescription = data['description'] || '';
+  const description = sanitizeDescription(rawDescription);
 
   // Validate start date
   try {
@@ -197,7 +215,8 @@ function validateFolgaRow(
   const startTime = data['start time'] || '';
   const endDate = data['end date'] || '';
   const endTime = data['end time'] || '';
-  const description = data['description'] || '';
+  const rawDescription = data['description'] || '';
+  const description = sanitizeDescription(rawDescription);
   const hasLunchBreakStr = data['has lunch break'] || data['lunch break'] || '';
   const lunchDurationStr = data['lunch duration'] || '';
   const hoursStr = data['hours'] || data['net hours'] || '';
@@ -306,6 +325,14 @@ export function importFromCSV(content: string): CSVImportResult {
 
   const headers = rows[0];
   const dataRows = rows.slice(1);
+
+  // Check for prototype pollution in headers BEFORE any processing
+  headers.forEach((header) => {
+    const normalizedHeader = header.toLowerCase().trim();
+    if (normalizedHeader === '__proto__' || normalizedHeader === 'constructor' || normalizedHeader === 'prototype') {
+      throw new Error(`Forbidden header name: ${header}`);
+    }
+  });
 
   // Detect type
   const type = detectCSVType(headers);

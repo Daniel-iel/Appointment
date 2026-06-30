@@ -12,8 +12,26 @@ export interface ExportButtonProps {
 
 export function ExportButton({ appointments }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [lastExport, setLastExport] = useState(0);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Security constant
+  const EXPORT_COOLDOWN = 2000; // 2 seconds between exports
 
   const handleExportCSV = () => {
+    // Rate limiting
+    const now = Date.now();
+    if (now - lastExport < EXPORT_COOLDOWN) {
+      const waitTime = Math.ceil((EXPORT_COOLDOWN - (now - lastExport)) / 1000);
+      setErrorMessage(`Please wait ${waitTime} second(s) before exporting again`);
+      setShowError(true);
+      setTimeout(() => setShowError(false), 3000);
+      setIsOpen(false);
+      return;
+    }
+
+    setLastExport(now);
     downloadCSV(appointments);
     setIsOpen(false);
   };
@@ -32,6 +50,19 @@ export function ExportButton({ appointments }: ExportButtonProps) {
         Export
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
+
+      {/* Error Toast */}
+      {showError && (
+        <div
+          className="fixed top-4 right-4 px-4 py-3 rounded-md shadow-lg z-50 flex items-center gap-2"
+          style={{
+            backgroundColor: colors['product-critical'],
+            color: colors['inverse-ink'],
+          }}
+        >
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
       {isOpen && (
         <>

@@ -16,7 +16,12 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
   const [errors, setErrors] = useState<ImportError[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [lastImport, setLastImport] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Security constants
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
+  const IMPORT_COOLDOWN = 5000; // 5 seconds between imports
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -25,10 +30,70 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
     // Reset states
     setErrors([]);
     setSuccessMessage(null);
+
+    // Rate limiting
+    const now = Date.now();
+    if (now - lastImport < IMPORT_COOLDOWN) {
+      setErrors([{
+        row: 0,
+        field: 'Rate Limit',
+        message: `Please wait ${Math.ceil((IMPORT_COOLDOWN - (now - lastImport)) / 1000)} seconds before importing again`
+      }]);
+      setShowErrorModal(true);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // File size validation
+    if (file.size > MAX_FILE_SIZE) {
+      setErrors([{
+        row: 0,
+        field: 'File Size',
+        message: `File size exceeds 5MB limit (${(file.size / 1024 / 1024).toFixed(2)}MB)`
+      }]);
+      setShowErrorModal(true);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // Content-type verification
+    if (file.type !== 'text/csv' && 
+        file.type !== 'application/vnd.ms-excel' && 
+        file.type !== 'application/csv' &&
+        file.type !== '') { // Empty type allowed as some systems don't set it for .csv
+      setErrors([{
+        row: 0,
+        field: 'File Type',
+        message: `Invalid file type: ${file.type || 'unknown'}. Only CSV files are allowed.`
+      }]);
+      setShowErrorModal(true);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
     setIsProcessing(true);
+    setLastImport(now);
 
     try {
-      // Read file content
+      // Read first 100 bytes to check for binary content
+      const header = await file.slice(0, 100).text();
+      if (header.includes('\x00') || /[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(header)) {
+        setErrors([{
+          row: 0,
+          field: 'File Content',
+          message: 'File appears to contain binary data. Only text CSV files are allowed.'
+        }]);
+        setShowErrorModal(true);
+        return;
+      }
+
+      // Read full file content
       const content = await file.text();
       
       // Import and validate

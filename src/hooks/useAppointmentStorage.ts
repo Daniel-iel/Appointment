@@ -8,6 +8,7 @@ import {
   updateAppointment as updateInStorage,
   deleteAppointment as deleteFromStorage,
 } from '@/lib/storage'
+import { sanitizeDescription } from '@/utils/validators'
 
 /**
  * Custom hook for managing work entries with localStorage persistence
@@ -40,7 +41,10 @@ export function useAppointmentStorage() {
       
       // Handle both object and parameter forms
       if (typeof appointmentOrStartDate === 'object') {
-        appointment = appointmentOrStartDate as Appointment
+        appointment = {
+          ...appointmentOrStartDate,
+          description: sanitizeDescription(appointmentOrStartDate.description || '')
+        }
       } else {
         const now = new Date().toISOString()
         appointment = {
@@ -49,7 +53,7 @@ export function useAppointmentStorage() {
           startTime: startTime || '',
           endDate: endDate || '',
           endTime: endTime || '',
-          description: description || '',
+          description: sanitizeDescription(description || ''),
           createdAt: now,
           updatedAt: now,
         }
@@ -71,8 +75,11 @@ export function useAppointmentStorage() {
    */
   const update = useCallback(
     (appointment: Appointment): void => {
-      const updated = appointment
-      updated.updatedAt = new Date().toISOString()
+      const updated = {
+        ...appointment,
+        description: sanitizeDescription(appointment.description || ''),
+        updatedAt: new Date().toISOString()
+      }
 
       const newAppointments = appointments.map(apt => (apt.id === appointment.id ? updated : apt))
       setAppointments(newAppointments)

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from '@/lib/uuid';
 import { Folga, FolgaInput } from '@/lib/types';
 import { getFolgas, saveFolgas } from '@/lib/folgaStorage';
 import { calcTotalHours, applyLunchDeduction } from '@/lib/calculations';
+import { sanitizeDescription } from '@/utils/validators';
 
 /**
  * Custom hook for managing folgas (time-off) with localStorage persistence
@@ -53,7 +54,7 @@ export function useFolgaStorage() {
         startTime,
         endDate,
         endTime,
-        description,
+        description: sanitizeDescription(description),
         hours: netHours,
         grossHours: hasLunchBreak ? grossHours : undefined,
         hasLunchBreak: hasLunchBreak || undefined,
@@ -90,6 +91,7 @@ export function useFolgaStorage() {
       
       const updated = {
         ...folga,
+        description: sanitizeDescription(folga.description || ''),
         hours: netHours,
         grossHours: folga.hasLunchBreak ? grossHours : undefined,
         updatedAt: new Date().toISOString(),

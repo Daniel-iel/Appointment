@@ -50,17 +50,28 @@ export function sanitizeDescription(description: string): string {
     return ''
   }
 
-  // Remove HTML tags and scripts
-  const withoutTags = description.replace(/<[^>]*>/g, '')
+  // Remove script tags and their content
+  let sanitized = description.replace(/<script[^>]*>.*?<\/script>/gi, '')
+  
+  // Remove all HTML tags
+  sanitized = sanitized.replace(/<[^>]*>/g, '')
+  
+  // Remove javascript: protocol
+  sanitized = sanitized.replace(/javascript:/gi, '')
+  
+  // Remove event handlers (onclick, onerror, onload, etc.)
+  sanitized = sanitized.replace(/on\w+\s*=/gi, '')
 
-  // Escape HTML entities (only essential for security)
-  const escaped = withoutTags
+  // Escape HTML entities
+  sanitized = sanitized
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
 
   // Truncate to max 500 characters
-  return escaped.substring(0, 500)
+  return sanitized.substring(0, 500)
 }
 
 /**
