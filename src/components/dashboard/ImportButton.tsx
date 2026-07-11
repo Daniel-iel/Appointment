@@ -5,6 +5,7 @@ import { Appointment, Folga } from '@/lib/types';
 import { importFromCSV, CSVImportValidationError, ImportError } from '@/lib/import';
 import { colors } from '@/styles/design-tokens';
 import { Upload, X, AlertCircle } from 'lucide-react';
+import { t } from '@/utils/i18nClient';
 
 export interface ImportButtonProps {
   onImportAppointments: (appointments: Appointment[]) => void;
@@ -37,7 +38,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
       setErrors([{
         row: 0,
         field: 'Rate Limit',
-        message: `Please wait ${Math.ceil((IMPORT_COOLDOWN - (now - lastImport)) / 1000)} seconds before importing again`
+        message: t('import.rateLimit', { seconds: Math.ceil((IMPORT_COOLDOWN - (now - lastImport)) / 1000) })
       }]);
       setShowErrorModal(true);
       if (fileInputRef.current) {
@@ -51,7 +52,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
       setErrors([{
         row: 0,
         field: 'File Size',
-        message: `File size exceeds 5MB limit (${(file.size / 1024 / 1024).toFixed(2)}MB)`
+        message: t('import.fileSizeExceeded', { size: (file.size / 1024 / 1024).toFixed(2) })
       }]);
       setShowErrorModal(true);
       if (fileInputRef.current) {
@@ -68,7 +69,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
       setErrors([{
         row: 0,
         field: 'File Type',
-        message: `Invalid file type: ${file.type || 'unknown'}. Only CSV files are allowed.`
+        message: t('import.invalidFileType', { type: file.type || 'unknown' })
       }]);
       setShowErrorModal(true);
       if (fileInputRef.current) {
@@ -87,7 +88,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
         setErrors([{
           row: 0,
           field: 'File Content',
-          message: 'File appears to contain binary data. Only text CSV files are allowed.'
+          message: t('import.binaryData')
         }]);
         setShowErrorModal(true);
         return;
@@ -102,10 +103,10 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
       // Call appropriate callback
       if (result.type === 'appointment') {
         onImportAppointments(result.data as Appointment[]);
-        setSuccessMessage(`Successfully imported ${result.count} appointment(s)`);
+        setSuccessMessage(t('import.successAppointment', { count: result.count }));
       } else {
         onImportFolgas(result.data as Folga[]);
-        setSuccessMessage(`Successfully imported ${result.count} time-off record(s)`);
+        setSuccessMessage(t('import.successFolga', { count: result.count }));
       }
 
       // Show success for 3 seconds
@@ -144,7 +145,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
         accept=".csv"
         onChange={handleFileChange}
         className="hidden"
-        aria-label="Import CSV file"
+        aria-label={t('import.button')}
       />
 
       <button
@@ -157,7 +158,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
         }}
       >
         <Upload className="w-4 h-4" />
-        {isProcessing ? 'Importing...' : 'Import CSV'}
+        {isProcessing ? t('import.importing') : t('import.button')}
       </button>
 
       {/* Success Toast */}
@@ -205,7 +206,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
                   className="text-lg font-semibold"
                   style={{ color: colors.ink }}
                 >
-                  CSV Import Failed
+                  {t('import.modal.title')}
                 </h2>
               </div>
               <button
@@ -223,7 +224,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
                 className="mb-4"
                 style={{ color: colors['ink-subtle'] }}
               >
-                The CSV file contains {errors.length} validation error(s). All rows must be valid before import.
+                {t('import.modal.subtitle', { count: errors.length })}
               </p>
 
               <div className="space-y-2">
@@ -246,7 +247,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
                           className="font-medium"
                           style={{ color: colors.ink }}
                         >
-                          Row {error.row}, Field: {error.field}
+                          {t('import.modal.rowField', { row: error.row, field: error.field })}
                         </p>
                         <p
                           className="text-sm mt-1"
@@ -276,7 +277,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
                   color: colors['inverse-ink'],
                 }}
               >
-                Close
+                {t('import.modal.close')}
               </button>
             </div>
           </div>

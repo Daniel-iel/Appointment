@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   output: 'export',
   basePath: '/Appointment',
   assetPrefix: '/Appointment/',
+  env: {
+    NEXT_PUBLIC_BASE_PATH: '/Appointment',
+  },
   trailingSlash: true,
   turbopack: {
     root: path.resolve(__dirname),

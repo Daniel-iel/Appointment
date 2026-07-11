@@ -1,0 +1,18 @@
+{
+  "import": {
+    "button": "Importar",
+    "importing": "Importando...",
+    "successAppointment": "Importado com sucesso {count} agendamento(s)",
+    "successFolga": "Importado com sucesso {count} registro(s) de folga",
+    "rateLimit": "Aguarde {seconds} segundos antes de importar novamente",
+    "fileSizeExceeded": "O arquivo excede o limite de 5MB ({size}MB)",
+    "invalidFileType": "Tipo de arquivo inválido: {type}. Apenas arquivos CSV são permitidos.",
+    "binaryData": "O arquivo parece conter dados binários. Apenas arquivos CSV de texto são permitidos.",
+    "modal": {
+      "title": "Falha na importação CSV",
+      "subtitle": "O arquivo CSV contém {count} erro(s) de validação. Todas as linhas devem ser válidas antes da importação.",
+      "rowField": "Linha {row}, Campo: {field}",
+      "close": "Fechar"
+    }
+  }
+}

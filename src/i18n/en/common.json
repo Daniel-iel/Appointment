@@ -1,0 +1,18 @@
+{
+  "import": {
+    "button": "Import",
+    "importing": "Importing...",
+    "successAppointment": "Successfully imported {count} appointment(s)",
+    "successFolga": "Successfully imported {count} time-off record(s)",
+    "rateLimit": "Please wait {seconds} seconds before importing again",
+    "fileSizeExceeded": "File size exceeds 5MB limit ({size}MB)",
+    "invalidFileType": "Invalid file type: {type}. Only CSV files are allowed.",
+    "binaryData": "File appears to contain binary data. Only text CSV files are allowed.",
+    "modal": {
+      "title": "CSV Import Failed",
+      "subtitle": "The CSV file contains {count} validation error(s). All rows must be valid before import.",
+      "rowField": "Row {row}, Field: {field}",
+      "close": "Close"
+    }
+  }
+}

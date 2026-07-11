@@ -17,6 +17,7 @@ export function DashboardLayout({
   subtitle,
   actions,
 }: DashboardLayoutProps) {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.canvas }}>
       {/* Header */}
@@ -31,18 +32,26 @@ export function DashboardLayout({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Title Section */}
             <div className="flex items-center gap-3">
-              <div 
-                className="p-2 rounded-lg"
+              <div
+                className="p-3 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: colors['surface-2'] }}
               >
-                <Clock className="w-6 h-6" style={{ color: colors['product-terraform'] }} />
+                <img
+                  src={`${basePath}/logo_menu.png`}
+                  alt="Menu"
+                  className="w-8 h-8 object-contain"
+                />
               </div>
               <div>
-                <h1 
+                <h1
                   className="text-2xl font-bold tracking-tight"
                   style={{ color: colors.ink }}
                 >
-                  {title}
+                  <img
+                    src={`${basePath}/logo_extratime.png`}
+                    alt={typeof title === 'string' ? title : 'ExtraTime Dashboard'}
+                    className="h-10 object-contain"
+                  />
                 </h1>
                 {subtitle && (
                   <p className="text-sm mt-0.5" style={{ color: colors['ink-muted'] }}>
