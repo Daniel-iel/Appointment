@@ -166,7 +166,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
         <div
           className="fixed top-4 right-4 px-4 py-3 rounded-md shadow-lg z-50 flex items-center gap-2"
           style={{
-            backgroundColor: colors['product-active'],
+            backgroundColor: colors['semantic-success'],
             color: colors['inverse-ink'],
           }}
         >
@@ -200,7 +200,7 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
               <div className="flex items-center gap-2">
                 <AlertCircle
                   className="w-5 h-5"
-                  style={{ color: colors['product-critical'] }}
+                  style={{ color: colors['semantic-error'] }}
                 />
                 <h2
                   className="text-lg font-semibold"
@@ -232,15 +232,15 @@ export function ImportButton({ onImportAppointments, onImportFolgas }: ImportBut
                   <div
                     key={index}
                     className="p-3 rounded border"
-                    style={{
+                      style={{
                       backgroundColor: colors['surface-2'],
-                      borderColor: colors['product-critical'],
+                      borderColor: colors['semantic-error'],
                     }}
                   >
                     <div className="flex items-start gap-2">
-                      <AlertCircle
+                        <AlertCircle
                         className="w-4 h-4 mt-0.5 flex-shrink-0"
-                        style={{ color: colors['product-critical'] }}
+                        style={{ color: colors['semantic-error'] }}
                       />
                       <div>
                         <p

@@ -90,7 +90,6 @@ export function Heatmap({ data, title }: HeatmapProps) {
                         className="w-3 h-3 rounded-sm cursor-pointer transition-all hover:ring-2 hover:ring-offset-1"
                         style={{
                           backgroundColor: getIntensityColor(cell.intensity),
-                          ringColor: colors['accent-blue'],
                         }}
                         title={`${displayDate}: ${hoursText}h`}
                       />

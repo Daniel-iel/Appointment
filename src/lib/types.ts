@@ -29,7 +29,19 @@ export interface CompensationStatus {
 export interface ValidationError {
   field: string;
   message: string;
-  type: 'time_format' | 'date_format' | 'time_range' | 'xss' | 'empty' | 'other';
+  // Include common validation error types used throughout validators
+  type:
+    | 'time_format'
+    | 'date_format'
+    | 'time_range'
+    | 'xss'
+    | 'empty'
+    | 'other'
+    | 'format'
+    | 'range'
+    | 'required'
+    | 'type'
+    | 'length';
 }
 
 /**

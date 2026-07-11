@@ -57,7 +57,7 @@ export function ExportButton({ appointments }: ExportButtonProps) {
         <div
           className="fixed top-4 right-4 px-4 py-3 rounded-md shadow-lg z-50 flex items-center gap-2"
           style={{
-            backgroundColor: colors['product-critical'],
+            backgroundColor: colors['semantic-error'],
             color: colors['inverse-ink'],
           }}
         >
