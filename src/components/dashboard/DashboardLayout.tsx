@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import Image from 'next/image';
 import { colors } from '@/styles/design-tokens';
 import { Clock } from 'lucide-react';
 
@@ -36,10 +37,13 @@ export function DashboardLayout({
                 className="p-3 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: colors['surface-2'] }}
               >
-                <img
+                <Image
                   src={`${basePath}/logo_menu.png`}
                   alt="Menu"
+                  width={32}
+                  height={32}
                   className="w-8 h-8 object-contain"
+                  priority
                 />
               </div>
               <div>
@@ -47,10 +51,13 @@ export function DashboardLayout({
                   className="text-2xl font-bold tracking-tight"
                   style={{ color: colors.ink }}
                 >
-                  <img
+                  <Image
                     src={`${basePath}/logo_extratime.png`}
                     alt={typeof title === 'string' ? title : 'ExtraTime Dashboard'}
+                    width={100}
+                    height={40}
                     className="h-10 object-contain"
+                    priority
                   />
                 </h1>
                 {subtitle && (

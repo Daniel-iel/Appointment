@@ -1,0 +1,26 @@
+# ExtraTime - SEO Robots Configuration
+# Allow crawling of all public pages
+
+User-agent: *
+Allow: /
+Allow: /Appointment/
+Allow: /pt-BR/
+Allow: /en/
+Disallow: /api/
+Disallow: /.next/
+Disallow: /node_modules/
+
+# Sitemaps
+Sitemap: https://extratime-app.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0.5
+
+# Google Mobile
+User-agent: Googlebot-Mobile
+Allow: /

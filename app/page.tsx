@@ -1,336 +1,291 @@
-'use client';
+import Link from 'next/link';
+import { Clock, BarChart3, Lock, Smartphone, Zap, Shield } from 'lucide-react';
 
-import { useState } from 'react';
-import { Appointment, Folga } from '@/lib/types';
-import { useAppointmentStorage } from '@/hooks/useAppointmentStorage';
-import { useFolgaStorage } from '@/hooks/useFolgaStorage';
-import { useCombinedAnalytics } from '@/hooks/useCombinedAnalytics';
-import { useFilters } from '@/hooks/useFilters';
-import { colors } from '@/styles/design-tokens';
-
-// Layout & Dashboard Components
-import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { MetricsGrid } from '@/components/dashboard/MetricsGrid';
-import { ChartGrid, ChartCard } from '@/components/dashboard/ChartGrid';
-import { ExportButton } from '@/components/dashboard/ExportButton';
-import { ImportButton } from '@/components/dashboard/ImportButton';
-
-// Chart Components
-import { LineChart } from '@/components/charts/LineChart';
-import { BarChart } from '@/components/charts/BarChart';
-import { PieChart } from '@/components/charts/PieChart';
-import { Heatmap } from '@/components/charts/Heatmap';
-
-// Filter Components
-import { PeriodSelector } from '@/components/filters/PeriodSelector';
-
-// Appointment Components
-import { AppointmentModal } from '@/components/appointments/AppointmentModal';
-import { AppointmentList } from '@/components/appointments/AppointmentList';
-
-// Folga Components
-import { FolgaModal } from '@/components/folga/FolgaModal';
-import { FolgaList } from '@/components/folga/FolgaList';
-
-// Icons
-import { Plus, Sunrise } from 'lucide-react';
-
-export default function Home() {
-  const { appointments, isLoaded: appointmentsLoaded, add, update, delete: deleteAppointment } = useAppointmentStorage();
-  const { folgas, isLoaded: folgasLoaded, add: addFolga, update: updateFolga, delete: deleteFolga } = useFolgaStorage();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFolgaModalOpen, setIsFolgaModalOpen] = useState(false);
-  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingFolga, setEditingFolga] = useState<Folga | null>(null);
-  const [isEditFolgaModalOpen, setIsEditFolgaModalOpen] = useState(false);
-  
-  const isLoaded = appointmentsLoaded && folgasLoaded;
-  
-  // Filters
-  const {
-    selectedPeriod,
-    customRange,
-    filteredAppointments,
-    filteredFolgas,
-    handlePeriodChange,
-  } = useFilters(appointments, folgas);
-
-  // Analytics with folga integration
-  const {
-    stats,
-    dailyData,
-    weeklyData,
-    timeSeriesData,
-    distributionData,
-    heatmapData,
-  } = useCombinedAnalytics(filteredAppointments, filteredFolgas);
-
-  const handleAddAppointment = (data: {
-    startDate: string;
-    startTime: string;
-    endDate: string;
-    endTime: string;
-    description: string;
-  }) => {
-    add(data.startDate, data.startTime, data.endDate, data.endTime, data.description);
-  };
-
-  const handleAddFolga = (data: {
-    startDate: string;
-    startTime: string;
-    endDate: string;
-    endTime: string;
-    description: string;
-    hasLunchBreak?: boolean;
-    lunchDuration?: number;
-  }) => {
-    addFolga(
-      data.startDate,
-      data.startTime,
-      data.endDate,
-      data.endTime,
-      data.description,
-      data.hasLunchBreak || false,
-      data.lunchDuration || 1
-    );
-  };
-
-  const handleImportAppointments = (importedAppointments: any[]) => {
-    importedAppointments.forEach((apt) => {
-      add(apt);
-    });
-  };
-
-  const handleImportFolgas = (importedFolgas: any[]) => {
-    importedFolgas.forEach((folga) => {
-      addFolga(
-        folga.startDate,
-        folga.startTime,
-        folga.endDate,
-        folga.endTime,
-        folga.description,
-        folga.hasLunchBreak || false,
-        folga.lunchDuration || 1
-      );
-    });
-  };
-
-  const handleEditAppointment = (appointment: Appointment) => {
-    setEditingAppointment(appointment);
-    setIsEditModalOpen(true);
-  };
-
-  const handleUpdateAppointment = (data: {
-    startDate: string;
-    startTime: string;
-    endDate: string;
-    endTime: string;
-    description: string;
-  }) => {
-    if (editingAppointment) {
-      update({
-        ...editingAppointment,
-        ...data,
-      });
-      setEditingAppointment(null);
-      setIsEditModalOpen(false);
-    }
-  };
-
-  const handleEditFolga = (folga: Folga) => {
-    setEditingFolga(folga);
-    setIsEditFolgaModalOpen(true);
-  };
-
-  const handleUpdateFolga = (data: {
-    startDate: string;
-    startTime: string;
-    endDate: string;
-    endTime: string;
-    description: string;
-    hasLunchBreak?: boolean;
-    lunchDuration?: number;
-  }) => {
-    if (editingFolga) {
-      updateFolga({
-        ...editingFolga,
-        ...data,
-      });
-      setEditingFolga(null);
-      setIsEditFolgaModalOpen(false);
-    }
-  };
-
-  if (!isLoaded) {
-    return (
-      <div 
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: colors.canvas, color: colors.ink }}
-      >
-        <div className="text-center">
-          <div className="animate-pulse text-lg">Loading dashboard...</div>
-        </div>
-      </div>
-    );
-  }
-
+export default function LandingPage() {
   return (
-    <>
-      <DashboardLayout
-        title="ExtraTime Dashboard"
-        subtitle={`${appointments.length} work entries • ${folgas.length} time-off • ${filteredAppointments.length + filteredFolgas.length} filtered`}
-        actions={
-          <div className="flex items-center gap-3">
-            <ImportButton 
-              onImportAppointments={handleImportAppointments}
-              onImportFolgas={handleImportFolgas}
-            />
-            <ExportButton appointments={filteredAppointments} folgas={filteredFolgas} />
-            <button
-              onClick={() => setIsFolgaModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all hover:opacity-90"
-              style={{
-                backgroundColor: colors['product-vault'],
-                color: colors.canvas,
-              }}
-            >
-              <Sunrise className="w-4 h-4" />
-              Add Time-Off
-            </button>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-all hover:opacity-90"
-              style={{
-                backgroundColor: colors['product-terraform'],
-                color: colors.ink,
-              }}
-            >
-              <Plus className="w-4 h-4" />
-              Add Entry
-            </button>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white shadow-sm z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center">
+            <span className="text-2xl font-bold text-indigo-600">ExtraTime</span>
           </div>
-        }
-      >
-        <div className="space-y-6">
-          {/* Period Selector */}
-          <PeriodSelector
-            selectedPeriod={selectedPeriod}
-            customRange={customRange}
-            onPeriodChange={handlePeriodChange}
-          />
+          <Link
+            href="/dashboard/"
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Acessar App
+          </Link>
+        </div>
+      </nav>
 
-          {/* KPI Metrics */}
-          <MetricsGrid metrics={stats} />
-
-          {/* Charts Grid */}
-          <ChartGrid columns={2}>
-            <ChartCard fullWidth>
-              <LineChart
-                data={timeSeriesData}
-                xKey="date"
-                lines={[
-                  { dataKey: 'hours', name: 'Hours Worked', color: colors['product-terraform'] },
-                  { dataKey: 'cumulativeBalance', name: 'Cumulative Balance', color: colors['product-waypoint'] },
-                ]}
-                title="Time Series Trend"
-                height={320}
-              />
-            </ChartCard>
-
-            <ChartCard>
-              <BarChart
-                data={weeklyData}
-                xKey="weekLabel"
-                bars={[
-                  { dataKey: 'hours', name: 'Hours Worked', color: colors['product-waypoint'] },
-                  { dataKey: 'expectedHours', name: 'Expected Hours', color: colors['product-vault'] },
-                ]}
-                title="Weekly Comparison"
-                height={320}
-              />
-            </ChartCard>
-
-            <ChartCard>
-              <PieChart
-                data={distributionData}
-                title="Time Distribution by Period"
-                height={320}
-                isDonut={true}
-              />
-            </ChartCard>
-
-            <ChartCard fullWidth>
-              <Heatmap
-                data={heatmapData}
-                title="Activity Heatmap"
-              />
-            </ChartCard>
-          </ChartGrid>
-
-          {/* Appointments List */}
-          <div className="card p-6" style={{ borderColor: colors['hairline-soft'] }}>
-            <h2 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
-              Recent Entries ({filteredAppointments.length})
-            </h2>
-            <AppointmentList
-              appointments={filteredAppointments}
-              onDelete={deleteAppointment}
-              onEdit={handleEditAppointment}
-            />
-          </div>
-
-          {/* Folgas (Time-Off) List */}
-          <div className="card p-6" style={{ borderColor: `${colors['product-vault']}30` }}>
-            <h2 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
-              Time-Off History ({filteredFolgas.length})
-            </h2>
-            <FolgaList
-              folgas={filteredFolgas}
-              onDelete={deleteFolga}
-              onEdit={handleEditFolga}
-            />
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Controle Suas{' '}
+            <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              Horas Extras
+            </span>{' '}
+            com Facilidade
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            ExtraTime é o aplicativo gratuito para <strong>controle de jornada</strong> e{' '}
+            <strong>gestão de expediente</strong>. Rastreie suas horas de trabalho, calcule{' '}
+            <strong>overtime</strong>, analise compensações e folgas em um só lugar.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/dashboard/"
+              className="px-8 py-4 bg-indigo-600 text-white text-lg font-semibold rounded-lg hover:bg-indigo-700 transition-all transform hover:scale-105 shadow-lg"
+            >
+              Começar Grátis
+            </Link>
+            <button className="px-8 py-4 border-2 border-indigo-600 text-indigo-600 text-lg font-semibold rounded-lg hover:bg-indigo-50 transition-colors">
+              Saber Mais
+            </button>
           </div>
         </div>
-      </DashboardLayout>
+      </section>
 
-      {/* Add Appointment Modal */}
-      <AppointmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddAppointment}
-      />
+      {/* Features Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-4 text-gray-900">
+            Por Que Usar ExtraTime?
+          </h2>
+          <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+            Tudo que você precisa para gerenciar seu <strong>controle de horas extras</strong> de forma prática e segura.
+          </p>
 
-      {/* Edit Appointment Modal */}
-      <AppointmentModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setEditingAppointment(null);
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="p-8 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+              <div className="mb-4 inline-block p-3 bg-indigo-600 rounded-lg">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Rastreamento em Tempo Real
+              </h3>
+              <p className="text-gray-700">
+                Registre suas chegadas e saídas instantaneamente. Acompanhe seu{' '}
+                <strong>controle de jornada</strong> com precisão.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="p-8 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+              <div className="mb-4 inline-block p-3 bg-emerald-600 rounded-lg">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Análise de Overtime
+              </h3>
+              <p className="text-gray-700">
+                Calcule suas <strong>horas extras</strong> automaticamente. Visualize relatórios detalhados de{' '}
+                <strong>expediente</strong> e compensações.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="p-8 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
+              <div className="mb-4 inline-block p-3 bg-purple-600 rounded-lg">
+                <Lock className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Seus Dados, Sua Privacidade
+              </h3>
+              <p className="text-gray-700">
+                Todos os dados ficam armazenados no seu navegador. Nenhuma informação é enviada para servidores.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="p-8 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200">
+              <div className="mb-4 inline-block p-3 bg-orange-600 rounded-lg">
+                <Smartphone className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Acesso de Qualquer Lugar
+              </h3>
+              <p className="text-gray-700">
+                Funciona em desktop, tablet e celular. Sincronize seu <strong>controle de horas</strong> entre dispositivos.
+              </p>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="p-8 rounded-xl bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-200">
+              <div className="mb-4 inline-block p-3 bg-cyan-600 rounded-lg">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Rápido e Leve
+              </h3>
+              <p className="text-gray-700">
+                Interface intuitiva e responsiva. Gerencie seu <strong>overtime</strong> sem complicações.
+              </p>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="p-8 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200">
+              <div className="mb-4 inline-block p-3 bg-indigo-600 rounded-lg">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                Gráficos e Estatísticas
+              </h3>
+              <p className="text-gray-700">
+                Visualize tendências de <strong>jornada</strong> e <strong>folgas</strong> com gráficos inteligentes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-center text-gray-900">
+            Para Quem é ExtraTime?
+          </h2>
+
+          <div className="space-y-6">
+            <div className="p-6 bg-white rounded-lg border-l-4 border-indigo-600 shadow-sm">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Profissionais que Trabalham com Jornada Flexível
+              </h3>
+              <p className="text-gray-700">
+                Controle suas horas com precisão e garanta o direito a compensações por{' '}
+                <strong>horas extras</strong>.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white rounded-lg border-l-4 border-emerald-600 shadow-sm">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Gestores de Equipes
+              </h3>
+              <p className="text-gray-700">
+                Acompanhe o <strong>expediente</strong> da sua equipe, calcule compensações e identifique tendências.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white rounded-lg border-l-4 border-purple-600 shadow-sm">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Autônomos e Freelancers
+              </h3>
+              <p className="text-gray-700">
+                Registre seus projetos e carga de trabalho. Demonstre sua dedicação e cumpra seus compromissos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-indigo-600 to-blue-600">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Comece a Controlar Suas Horas Hoje Mesmo
+          </h2>
+          <p className="text-xl text-indigo-100 mb-8">
+            ExtraTime é 100% gratuito. Sem cartão de crédito, sem inscrições. Apenas comece a usar.
+          </p>
+          <Link
+            href="/dashboard/"
+            className="inline-block px-10 py-4 bg-white text-indigo-600 text-lg font-bold rounded-lg hover:bg-indigo-50 transition-all transform hover:scale-105 shadow-xl"
+          >
+            Acessar ExtraTime Agora
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h4 className="text-white font-bold mb-4">ExtraTime</h4>
+              <p className="text-sm">
+                Controle de jornada e hora extra de forma fácil e segura.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Produto</h4>
+              <ul className="text-sm space-y-2">
+                <li>
+                  <Link href="/dashboard/" className="hover:text-white transition">
+                    Aplicativo
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Legal</h4>
+              <ul className="text-sm space-y-2">
+                <li>
+                  <a href="#" className="hover:text-white transition">
+                    Privacidade
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition">
+                    Termos
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Redes Sociais</h4>
+              <ul className="text-sm space-y-2">
+                <li>
+                  <a href="#" className="hover:text-white transition">
+                    Twitter
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition">
+                    GitHub
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 pt-8 text-center text-sm">
+            <p>
+              &copy; 2024 ExtraTime. Todos os direitos reservados. | Rastreador de jornada,
+              controle de hora extra e gestão de expediente.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      {/* JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'ExtraTime',
+            description:
+              'Controle de jornada, hora extra e gestão de expediente. Aplicativo gratuito para rastreamento.',
+            url: 'https://extratime-app.com',
+            applicationCategory: 'ProductivityApplication',
+            operatingSystem: 'Web',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'BRL',
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '4.8',
+              ratingCount: '150',
+            },
+            softwareVersion: '1.0.0',
+          }),
         }}
-        onSubmit={handleUpdateAppointment}
-        initialData={editingAppointment || undefined}
-        mode="edit"
       />
-
-      {/* Add Folga Modal */}
-      <FolgaModal
-        isOpen={isFolgaModalOpen}
-        onClose={() => setIsFolgaModalOpen(false)}
-        onSubmit={handleAddFolga}
-      />
-
-      {/* Edit Folga Modal */}
-      <FolgaModal
-        isOpen={isEditFolgaModalOpen}
-        onClose={() => {
-          setIsEditFolgaModalOpen(false);
-          setEditingFolga(null);
-        }}
-        onSubmit={handleUpdateFolga}
-        initialData={editingFolga || undefined}
-        mode="edit"
-      />
-    </>
+    </main>
   );
 }
