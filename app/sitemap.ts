@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 
 export const dynamic = 'force-static';
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://extratime-app.com';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 export default function sitemap(): MetadataRoute.Sitemap {
